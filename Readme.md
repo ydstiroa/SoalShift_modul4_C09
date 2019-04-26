@@ -14,6 +14,109 @@ Perhatian: Karakter ‘/’ adalah karakter ilegal dalam penamaan file atau fold
 
 ### Jawab
 
+Pertama buat enkripsi dan dekripsi
+
+	void encrypt(char * enkrip){
+	    if(strcmp("..", enkrip) ==0 || strcmp(".", enkrip)==0){
+		return;
+	    }
+	    for(int i=0;i<strlen(enkrip);i++){
+		for(int j=0;j<94;j++){
+		    if(enkrip[i]==list[j]){
+			enkrip[i]= list[(j+17)%94];
+			break;
+		    }
+		}
+	    }
+	}
+
+	void decrypt(char * dekrip){
+	    if(strcmp("..", dekrip) ==0 || strcmp(".", dekrip)==0){
+		return;
+	    }
+	    for(int i=0;i<strlen(dekrip);i++){
+		for(int j=0;j<94;j++){
+		    if(dekrip[i]==list[j]){
+			dekrip[i]= list[(j+77)%94];
+			break;
+		    }
+		}
+	    }
+	}
+
+Pada readdir dan getatt jangan lupa untuk meng enkripsi
+
+	static int xmp_getattr(const char *path, struct stat *stbuf)
+	{
+	    int res;
+	    char fpath[1000];
+	    char encry[1000];
+	    sprintf(encry, "%s", path);
+	    encrypt(encry);
+
+	    printf("\tAttributes of %s requested\n", encry);
+	    sprintf(fpath, "%s%s", dirpath, encry);
+	    stbuf->st_uid = getuid();
+	    stbuf->st_gid = getgid();
+	    stbuf->st_atime = time( NULL );
+	    stbuf->st_mtime = time(NULL);
+	    if ( strcmp( path, "/" ) == 0 )
+		{
+			stbuf->st_mode = S_IFDIR | 0755;
+			stbuf->st_nlink = 4;
+		}
+		else
+		{
+			stbuf->st_mode = S_IFREG | 0444;
+			stbuf->st_nlink = 4;
+			stbuf->st_size = 1024;
+		}
+	    res = lstat(fpath, stbuf);
+
+	    if (res == -1)
+		return -errno;
+
+	    return 0;
+	}
+	
+	static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
+                       off_t offset, struct fuse_file_info *fi)
+	{
+	    char fpath[1000];
+	    char encry[1000];
+	    sprintf(encry, "%s", path);
+	    encrypt(encry);
+
+	    sprintf(fpath, "%s%s", dirpath, encry);
+	    printf("AKSES %s\n", fpath);
+
+	    DIR *dp;
+	    struct dirent *de;
+
+	    (void)offset;
+	    (void)fi;
+
+	    dp = opendir(fpath);
+	    if (dp == NULL)
+		return -errno;
+
+	    while ((de = readdir(dp)) != NULL)
+	    {
+		struct stat st;
+		memset(&st, 0, sizeof(st));
+		st.st_ino = de->d_ino;
+		st.st_mode = de->d_type << 12;
+		char simpan[1000];
+		strcpy(simpan, de->d_name);
+		decrypt(simpan);
+		int res = (filler(buf, simpan, &st, 0));
+		if (res != 0)
+		    break;
+	    }
+
+	    closedir(dp);
+	    return 0;
+	}
 
 
 ## Soal No. 2
