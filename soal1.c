@@ -238,6 +238,32 @@ static int xmp_chown(const char *path, uid_t uid, gid_t gid)
     return 0;
 }
 
+static int xmp_create(const char *path, mode_t mode,
+		      struct fuse_file_info *fi)
+{
+	int res;
+
+    char dpath[1000];
+    char fpath[1000];
+    char temp[1000] = "/YOUTUBER";
+    
+    sprintf(dpath,"%s",path);
+    if(strlen(dpath)!=9 && strcmp(dpath,temp) == 0){
+        strcat(dpath,".iz1");
+        sprintf(fpath, "%s%s",dirpath,dpath);
+        res = creat(fpath,0640);
+    }else{
+        sprintf(fpath, "%s%s",dirpath,dpath);
+        res = creat(fpath,mode);
+    }
+    
+	if (res == -1)
+		return -errno;
+
+	
+	return 0;
+}
+
 static int xmp_truncate(const char *path, off_t size)
 {
     int res;
@@ -304,7 +330,10 @@ static struct fuse_operations xmp_oper = {
 	.utimens	= xmp_utimens,
 	.open		= xmp_open,
 	.read		= xmp_read,
+	.create	 	= xmp_create,
 };
+
+
 
 int main(int argc, char *argv[])
 {
