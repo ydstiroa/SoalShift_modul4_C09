@@ -248,7 +248,7 @@ static int xmp_create(const char *path, mode_t mode,
     char temp[1000] = "/YOUTUBER";
     
     sprintf(dpath,"%s",path);
-    if(strlen(dpath)!=9 && strcmp(dpath,temp) == 0){
+    if(strcmp(dpath,temp) == 0){
         strcat(dpath,".iz1");
         sprintf(fpath, "%s%s",dirpath,dpath);
         res = creat(fpath,0640);
