@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <sys/time.h>
 
-static const char *dirpath = "/home/najaslanardo/Documents/shift4";
+static const char *dirpath = "/home/najaslardo/Documents/shift4";
 const char charlist[] = "qE1~ YMUR2\"`hNIdPzi%^t@(Ao:=CQ,nx4S[7mHFye#aT6+v)DfKL$r?bkOGB>}!9_wV']jcp5JZ&Xl|\\8s;g<{3.u*W-0";
 
 
@@ -45,12 +45,12 @@ static int xmp_getattr(const char *path, struct stat *stbuf)
 {
     int res;
     char fpath[1000];
-    char enc[1000];
-    sprintf(enc, "%s", path);
-    enkripsi(enc);
+    char krip[1000];
+    sprintf(krip, "%s", path);
+    enkripsi(krip);
 
-    printf("\tAttributes of %s requested\n", enc);
-    sprintf(fpath, "%s%s", dirpath, enc);
+    printf("\tAttributes of %s requested\n", krip);
+    sprintf(fpath, "%s%s", dirpath, krip);
     stbuf->st_uid = getuid();
     stbuf->st_gid = getgid();
     stbuf->st_atime = time( NULL );
@@ -79,10 +79,10 @@ static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 {
     char fpath[1000];
     char temp[1000];
-    char enc[1000];
-    sprintf(enc, "%s", path);
-    enkripsi(enc);
-    sprintf(fpath, "%s%s", dirpath, enc);
+    char krip[1000];
+    sprintf(krip, "%s", path);
+    enkripsi(krip);
+    sprintf(fpath, "%s%s", dirpath, krip);
     printf("AKSES %s\n", fpath);
 
     DIR *dp;
@@ -139,10 +139,10 @@ static int xmp_mknod(const char *path, mode_t mode, dev_t rdev)
     /* On Linux this could just be 'mknod(path, mode, rdev)' but this
        is more portable */
     char fpath[1000];
-    char name[1000];
-    sprintf(name,"%s",path);
-    enkripsi(name);
-    sprintf(fpath, "%s%s",dirpath,name);
+    char dpath[1000];
+    sprintf(dpath,"%s",path);
+    enkripsi(dpath);
+    sprintf(fpath, "%s%s",dirpath,dpath);
     if (S_ISREG(mode)) {
         res = open(fpath, O_CREAT | O_EXCL | O_WRONLY, mode);
         if (res >= 0)
@@ -162,10 +162,10 @@ static int xmp_mkdir(const char *path, mode_t mode)
 {
     int res;
     char fpath[1000];
-    char name[1000];
-    sprintf(name,"%s",path);
-    enkripsi(name);
-    sprintf(fpath, "%s%s",dirpath,name);
+    char dpath[1000];
+    sprintf(dpath,"%s",path);
+    enkripsi(dpath);
+    sprintf(fpath, "%s%s",dirpath,dpath);
     res = mkdir(fpath, mode);
     if (res == -1)
         return -errno;
@@ -177,10 +177,10 @@ static int xmp_rmdir(const char *path)
 {
     int res;
     char fpath[1000];
-    char name[1000];
-    sprintf(name,"%s",path);
-    enkripsi(name);
-    sprintf(fpath, "%s%s",dirpath,name);
+    char dpath[1000];
+    sprintf(dpath,"%s",path);
+    enkripsi(dpath);
+    sprintf(fpath, "%s%s",dirpath,dpath);
     res = rmdir(fpath);
     if (res == -1)
         return -errno;
@@ -193,14 +193,14 @@ static int xmp_rename(const char *from, const char *to)
     int res;
     char new_from[1000];
     char new_to[1000];
-    char name1[1000];
-    char name2[1000];
-    sprintf(name1,"%s",from);
-    sprintf(name2,"%s",to);
-    enkripsi(name1);
-    enkripsi(name2);
-    sprintf(new_from,"%s%s",dirpath,name1);
-    sprintf(new_to,"%s%s",dirpath,name2);
+    char rena[1000];
+    char rname[1000];
+    sprintf(rena,"%s",from);
+    sprintf(rname,"%s",to);
+    enkripsi(rena);
+    enkripsi(rname);
+    sprintf(new_from,"%s%s",dirpath,rena);
+    sprintf(new_to,"%s%s",dirpath,rname);
     res = rename(new_from, new_to);
     if (res == -1)
         return -errno;
@@ -212,10 +212,10 @@ static int xmp_chmod(const char *path, mode_t mode)
 {
     int res;
     char fpath[1000];
-    char name[1000];
-    sprintf(name,"%s",path);
-    enkripsi(name);
-    sprintf(fpath, "%s%s",dirpath,name);
+    char dpath[1000];
+    sprintf(dpath,"%s",path);
+    enkripsi(dpath);
+    sprintf(fpath, "%s%s",dirpath,dpath);
     res = chmod(fpath, mode);
     if (res == -1)
         return -errno;
@@ -227,10 +227,10 @@ static int xmp_chown(const char *path, uid_t uid, gid_t gid)
 {
     int res;
     char fpath[1000];
-    char name[1000];
-    sprintf(name,"%s",path);
-    enkripsi(name);
-    sprintf(fpath, "%s%s",dirpath,name);
+    char dpath[1000];
+    sprintf(dpath,"%s",path);
+    enkripsi(dpath);
+    sprintf(fpath, "%s%s",dirpath,dpath);
     res = lchown(fpath, uid, gid);
     if (res == -1)
         return -errno;
@@ -268,10 +268,10 @@ static int xmp_truncate(const char *path, off_t size)
 {
     int res;
     char fpath[1000];
-    char name[1000];
-    sprintf(name,"%s",path);
-    enkripsi(name);
-    sprintf(fpath, "%s%s",dirpath,name);
+    char dpath[1000];
+    sprintf(dpath,"%s",path);
+    enkripsi(dpath);
+    sprintf(fpath, "%s%s",dirpath,dpath);
     res = truncate(fpath, size);
     if (res == -1)
         return -errno;
@@ -279,42 +279,35 @@ static int xmp_truncate(const char *path, off_t size)
     return 0;
 }
 
-static int xmp_utimens(const char *path, const struct timespec ts[2])
-{
-    int res;
-    struct timeval tv[2];
-
-    char fpath[1000];
-    char name[1000];
-    sprintf(name,"%s",path);
-    enkripsi(name);
-    sprintf(fpath, "%s%s",dirpath,name);
-
-    tv[0].tv_sec = ts[0].tv_sec;
-    tv[0].tv_usec = ts[0].tv_nsec / 1000;
-    tv[1].tv_sec = ts[1].tv_sec;
-    tv[1].tv_usec = ts[1].tv_nsec / 1000;
-
-    res = utimes(fpath, tv);
-    if (res == -1)
-        return -errno;
-
-    return 0;
-}
 static int xmp_open(const char *path, struct fuse_file_info *fi)
 {
     int res;
     char fpath[1000];
-    char name[1000];
-    sprintf(name,"%s",path);
-    enkripsi(name);
-    sprintf(fpath, "%s%s",dirpath,name);
+    char dpath[1000];
+    sprintf(dpath,"%s",path);
+    enkripsi(dpath);
+    sprintf(fpath, "%s%s",dirpath,dpath);
     res = open(fpath, fi->flags);
     if (res == -1)
         return -errno;
 
     close(res);
     return 0;
+}
+
+static int xmp_unlink(const char *path)
+{
+	int res;
+    char dpath[1000];
+    char fpath[1000];
+    sprintf(dpath,"%s",path);
+    enkripsi(dpath);
+    sprintf(fpath, "%s%s", dirpath, dpath);
+	res = unlink(fpath);
+	if (res == -1)
+		return -errno;
+
+	return 0;
 }
 
 static struct fuse_operations xmp_oper = {
@@ -327,9 +320,9 @@ static struct fuse_operations xmp_oper = {
 	.chmod		= xmp_chmod,
 	.chown		= xmp_chown,
 	.truncate	= xmp_truncate,
-	.utimens	= xmp_utimens,
 	.open		= xmp_open,
 	.read		= xmp_read,
+    .unlink	    = xmp_unlink,
 	.create	 	= xmp_create,
 };
 
